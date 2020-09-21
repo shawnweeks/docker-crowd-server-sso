@@ -1,0 +1,30 @@
+{% raw %}<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.atlassian.crowd.util.I18nHelper" %>
+<%@ page import="org.springframework.context.ApplicationContext" %>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%
+    final ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletConfig().getServletContext());
+    final I18nHelper i18nHelper = applicationContext.getBean(I18nHelper.class);
+%>
+
+<html>
+<head>
+    <title><%=i18nHelper.getText("login.title")%></title>
+    <meta name="decorator" content="atl.wrm"/>
+    <meta name="viewport" content="width=device-width">{% endraw %}
+	<script type="text/javascript">
+	  var ssoUrl = '{{ CUSTOM_SSO_LOGIN_URL | default('') | replace("'", "\\'") }}';
+		
+	  var url = new URL(window.location.href);
+	  var osDestination = url.searchParams.get("next");
+		
+	  osDestination = osDestination ? osDestination : "";
+	  window.location.replace(ssoUrl + '?redirectTo=' + encodeURIComponent('https://' + window.location.host + '/crowd' + osDestination));
+	</script>{% raw %}
+
+</head>
+
+<body>
+<div id="react-container"></div>
+</body>
+</html>{% endraw %}
