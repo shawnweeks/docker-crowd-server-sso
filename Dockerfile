@@ -29,7 +29,7 @@ RUN yum install -y java-11-openjdk-devel procps git python2 python2-jinja2 && \
 
 COPY [ "entrypoint.sh", "entrypoint.py", "entrypoint_helpers.py", "/tmp/scripts/" ]
 
-# COPY [ "templates/*.j2", "/opt/jinja-templates/" ]
+COPY [ "templates/*.j2", "/opt/jinja-templates/" ]
 
 RUN mkdir -p ${CROWD_HOME}/shared && \
     mkdir -p ${CROWD_INSTALL_DIR} && \

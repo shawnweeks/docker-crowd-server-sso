@@ -5,7 +5,7 @@ from entrypoint_helpers import env, gen_cfg, set_props
 CROWD_HOME = env["CROWD_HOME"]
 CROWD_INSTALL_DIR = env["CROWD_INSTALL_DIR"]
 
-# gen_cfg("server.xml.j2", "{}/conf/server.xml".format(CROWD_INSTALL_DIR))
+gen_cfg("server.xml.j2", "{}/apache-tomcat/conf/server.xml".format(CROWD_INSTALL_DIR))
 
 # if "CROWD_SSO_ENABLED" in env and env["CROWD_SSO_ENABLED"] == "true":
 #     gen_cfg("seraph-config.xml.j2", "{}/atlassian-jira/WEB-INF/classes/seraph-config.xml".format(CROWD_INSTALL_DIR))
