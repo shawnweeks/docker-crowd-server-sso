@@ -3,6 +3,8 @@
 set -e
 umask 0027
 
+ls -lh ${CROWD_INSTALL_DIR}
+
 : ${JAVA_OPTS:=}
 : ${CATALINA_OPTS:=}
 
@@ -11,13 +13,13 @@ export CATALINA_OPTS="${CATALINA_OPTS}"
 
 startup() {
     echo Starting Jira Server
-    ${CROWD_INSTALL_DIR}/bin/start-crowd.sh
-    tail -F ${CROWD_HOME}/log/atlassian-crowd.log
+    ${CROWD_INSTALL_DIR}/start_crowd.sh
+    tail -F ${CROWD_HOME}/logs/atlassian-crowd.log
 }
 
 shutdown() {
     echo Stopping Jira Server
-    ${CROWD_INSTALL_DIR}/bin/stop-crowd.sh
+    ${CROWD_INSTALL_DIR}/stop_crowd.sh
 }
 
 trap "shutdown" INT

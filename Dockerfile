@@ -38,15 +38,15 @@ RUN mkdir -p ${CROWD_HOME}/shared && \
     curl --silent -L ${DOWNLOAD_URL} | tar -xz --strip-components=1 -C "$CROWD_INSTALL_DIR" && \
     sed -i -e 's/-Xms\([0-9]\+[kmg]\) -Xmx\([0-9]\+[kmg]\)/-Xms\${JVM_MINIMUM_MEMORY:=\1} -Xmx\${JVM_MAXIMUM_MEMORY:=\2} \${JVM_SUPPORT_RECOMMENDED_ARGS} -Dcrowd.home=\${CROWD_HOME}/g' ${CROWD_INSTALL_DIR}/apache-tomcat/bin/setenv.sh && \
     chown -R "${CROWD_USER}:${CROWD_GROUP}" "${CROWD_INSTALL_DIR}" && \
-    cp /tmp/scripts/* ${CROWD_INSTALL_DIR}/bin && \
+    cp /tmp/scripts/* ${CROWD_INSTALL_DIR} && \
     chown -R "${CROWD_USER}:${CROWD_GROUP}" "${CROWD_HOME}" && \
-    chmod 755 ${CROWD_INSTALL_DIR}/bin/entrypoint.*
+    chmod 755 ${CROWD_INSTALL_DIR}/entrypoint.*
 
 EXPOSE 8095
 
 VOLUME ${CROWD_HOME}
 USER ${CROWD_USER}
 ENV JAVA_HOME=/usr/lib/jvm/java-11
-ENV PATH=${PATH}:${CROWD_INSTALL_DIR}/bin
+ENV PATH=${PATH}:${CROWD_INSTALL_DIR}
 WORKDIR ${CROWD_HOME}
 ENTRYPOINT [ "entrypoint.sh" ]
