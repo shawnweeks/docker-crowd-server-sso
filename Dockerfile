@@ -6,10 +6,25 @@
 # Bitbucket     2003
 # Crowd         2004
 # Bamboo        2005
-
-ARG BASE_REGISTRY=registry.cloudbrocktec.com
+ARG BASE_REGISTRY
 ARG BASE_IMAGE=redhat/ubi/ubi7
-ARG BASE_TAG=7.8
+ARG BASE_TAG=7.9
+
+FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG} as build
+
+ARG CROWD_VERSION
+ARG CROWD_PACKAGE=atlassian-crowd-${CROWD_VERSION}.tar.gz
+
+COPY [ "${CROWD_PACKAGE}", "/tmp/" ]
+
+RUN mkdir -p /tmp/crowd_package && \
+    tar -xf /tmp/${CROWD_PACKAGE} -C "/tmp/crowd_package" --strip-components=1
+
+
+###############################################################################
+ARG BASE_REGISTRY
+ARG BASE_IMAGE=redhat/ubi/ubi7
+ARG BASE_TAG=7.9
 
 FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG}
 
@@ -21,25 +36,19 @@ ENV CROWD_GID 2004
 ENV CROWD_HOME /var/atlassian/application-data/crowd
 ENV CROWD_INSTALL_DIR /opt/atlassian/crowd
 
-ARG CROWD_VERSION
-ARG DOWNLOAD_URL=https://product-downloads.atlassian.com/software/crowd/downloads/atlassian-crowd-${CROWD_VERSION}.tar.gz
-
 RUN yum install -y java-11-openjdk-devel procps git python2 python2-jinja2 && \
-    yum clean all
-
-COPY [ "entrypoint.sh", "entrypoint.py", "entrypoint_helpers.py", "/tmp/scripts/" ]
-
-COPY [ "templates/*.j2", "/opt/jinja-templates/" ]
-
-RUN mkdir -p ${CROWD_HOME}/shared && \
+    yum clean all && \    
+    mkdir -p ${CROWD_HOME}/shared && \
     mkdir -p ${CROWD_INSTALL_DIR} && \
     groupadd -r -g ${CROWD_GID} ${CROWD_GROUP} && \
-    useradd -r -u ${CROWD_UID} -g ${CROWD_GROUP} -M -d ${CROWD_HOME} ${CROWD_USER} && \
-    curl --silent -L ${DOWNLOAD_URL} | tar -xz --strip-components=1 -C "$CROWD_INSTALL_DIR" && \
-    sed -i -e 's/-Xms\([0-9]\+[kmg]\) -Xmx\([0-9]\+[kmg]\)/-Xms\${JVM_MINIMUM_MEMORY:=\1} -Xmx\${JVM_MAXIMUM_MEMORY:=\2} \${JVM_SUPPORT_RECOMMENDED_ARGS} -Dcrowd.home=\${CROWD_HOME}/g' ${CROWD_INSTALL_DIR}/apache-tomcat/bin/setenv.sh && \
-    chown -R "${CROWD_USER}:${CROWD_GROUP}" "${CROWD_INSTALL_DIR}" && \
-    cp /tmp/scripts/* ${CROWD_INSTALL_DIR} && \
-    chown -R "${CROWD_USER}:${CROWD_GROUP}" "${CROWD_HOME}" && \
+    useradd -r -u ${CROWD_UID} -g ${CROWD_GROUP} -M -d ${CROWD_HOME} ${CROWD_USER}
+
+COPY [ "templates/*.j2", "/opt/jinja-templates/" ]
+COPY --from=build --chown=${CROWD_USER}:${CROWD_GROUP} [ "/tmp/crowd_package", "${CROWD_INSTALL_DIR}/" ]
+COPY --chown=${CROWD_USER}:${CROWD_GROUP} [ "entrypoint.sh", "entrypoint.py", "entrypoint_helpers.py", "${CROWD_INSTALL_DIR}/" ]
+
+
+RUN sed -i -e 's/-Xms\([0-9]\+[kmg]\) -Xmx\([0-9]\+[kmg]\)/-Xms\${JVM_MINIMUM_MEMORY:=\1} -Xmx\${JVM_MAXIMUM_MEMORY:=\2} \${JVM_SUPPORT_RECOMMENDED_ARGS} -Dcrowd.home=\${CROWD_HOME}/g' ${CROWD_INSTALL_DIR}/apache-tomcat/bin/setenv.sh && \
     chmod 755 ${CROWD_INSTALL_DIR}/entrypoint.*
 
 EXPOSE 8095
