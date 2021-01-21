@@ -26,7 +26,7 @@ docker run --init -it --rm \
     --name crowd  \
     -v crowd-data:/var/atlassian/application-data/crowd \
     -p 8095:8095 \
-    ${REGISTRY}/atlassian-suite/crowd-server-sso:4.1.1
+    ${REGISTRY}/atlassian-suite/crowd-server-sso:${CROWD_VERSION}
 ```
 
 ### SSO Run Command
