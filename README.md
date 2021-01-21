@@ -1,24 +1,32 @@
+### Download Software
+```shell
+export CROWD_VERSION=4.1.1
+wget https://product-downloads.atlassian.com/software/crowd/downloads/atlassian-crowd-${CROWD_VERSION}.tar.gz
+```
+
 ### Build Command
 ```shell
+export CROWD_VERSION=4.1.1
 docker build \
-    -t $REGISTRY/atlassian-suite/crowd-server-sso:4.1.1.$(date +"%Y%m%d%H%M%S") \
-    --build-arg BASE_REGISTRY=$REGISTRY \
-    --build-arg CROWD_VERSION=4.1.1 \
+    -t ${REGISTRY}/atlassian-suite/crowd-server-sso:${CROWD_VERSION} \
+    --build-arg BASE_REGISTRY=${REGISTRY} \
+    --build-arg CROWD_VERSION=${CROWD_VERSION} \
     .
 ```
 
 ### Push to Registry
 ```shell
-docker push $REGISTRY/atlassian-suite/crowd-server-sso
+docker push ${REGISTRY}/atlassian-suite/crowd-server-sso
 ```
 
 ### Simple Run Command
 ```shell
+export CROWD_VERSION=4.1.1
 docker run --init -it --rm \
     --name crowd  \
     -v crowd-data:/var/atlassian/application-data/crowd \
     -p 8095:8095 \
-    $REGISTRY/atlassian-suite/crowd-server-sso:4.1.1
+    ${REGISTRY}/atlassian-suite/crowd-server-sso:4.1.1
 ```
 
 ### SSO Run Command
@@ -32,7 +40,7 @@ docker run --init -it --rm \
     -e ATL_TOMCAT_SECURE='true' \
     -e ATL_PROXY_NAME='cloudbrocktec.com' \
     -e ATL_PROXY_PORT='443' \
-    $REGISTRY/atlassian-suite/crowd-server-sso:4.1.1
+    ${REGISTRY}/atlassian-suite/crowd-server-sso:4.1.1
 
 # Run second after you've setup the crowd connection
 docker run --init -it --rm \
@@ -45,7 +53,7 @@ docker run --init -it --rm \
     -e ATL_PROXY_PORT='443' \
     -e CROWD_SSO_ENABLED='true' \
     -e CUSTOM_SSO_LOGIN_URL='https://cloudbrocktec.com/spring-crowd-sso/saml/login' \
-    $REGISTRY/atlassian-suite/crowd-server-sso:4.1.1
+    ${REGISTRY}/atlassian-suite/crowd-server-sso:4.1.1
 ```
 
 ### Environment Variables
