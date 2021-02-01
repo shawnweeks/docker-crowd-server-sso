@@ -29,6 +29,27 @@ docker run --init -it --rm \
     ${REGISTRY}/atlassian-suite/crowd-server-sso:${CROWD_VERSION}
 ```
 
+### Simple SSL Run Command
+```shell
+export CONFLUENCE_VERSION=7.7.3
+keytool -genkey -noprompt -keyalg RSA \
+        -alias selfsigned -keystore keystore.jks -storepass changeit \
+        -dname "CN=localhost" \
+        -validity 360 -keysize 2048
+docker run --init -it --rm \
+    --name crowd  \
+    -v crowd-data:/var/atlassian/application-data/crowd \
+    -v $PWD/keystore.jks:/tmp/keystore.jks \
+    -e ATL_TOMCAT_SCHEME=https \
+    -e ATL_TOMCAT_SECURE=true \
+    -e ATL_TOMCAT_SSL_ENABLED=true \
+    -e ATL_TOMCAT_KEY_ALIAS=selfsigned \
+    -e ATL_TOMCAT_KEYSTORE_FILE=/tmp/keystore.jks \
+    -e ATL_TOMCAT_KEYSTORE_PASS=changeit \
+    -p 8095:8095 \
+    ${REGISTRY}/atlassian-suite/crowd-server-sso:${CROWD_VERSION}
+```
+
 ### SSO Run Command
 ```shell
 # Run first and setup Crowd Directory
@@ -62,10 +83,16 @@ docker run --init -it --rm \
 | ATL_TOMCAT_PORT | The port crowd listens on, this may need to be changed depending on your environment. | 8080 |
 | ATL_TOMCAT_SCHEME | The protocol via which crowd is accessed | http |
 | ATL_TOMCAT_SECURE | Set to true if `ATL_TOMCAT_SCHEME` is 'https' | false |
-| ATL_PROXY_NAME | The reverse proxys full URL for crowd | None |
-| ATL_PROXY_PORT | The reverse proxy's port number | None |
-| CUSTOM_SSO_LOGIN_URL | Login URL for Custom SSO Support | None |
-| CROWD_SSO_ENABLED | Enable Crowd SSO Support | false |
+| ATL_TOMCAT_PROXY_NAME | The reverse proxys full URL for crowd | None |
+| ATL_TOMCAT_PROXY_PORT | The reverse proxy's port number | None |
+| ATL_TOMCAT_SSL_ENABLED | Enable Tomcat SSL Support | None |
+| ATL_TOMCAT_SSL_ENABLED_PROTOCOLS | Allowed SSL Protocols | TLSv1.2,TLSv1.3 |
+| ATL_TOMCAT_KEY_ALIAS | Tomcat SSL Key Alias | None |
+| ATL_TOMCAT_KEYSTORE_FILE | Tomcat SSL Keystore File | None |
+| ATL_TOMCAT_KEYSTORE_PASS | Tomcat SSL Keystore Password | None |
+| ATL_TOMCAT_KEYSTORE_TYPE | Tomcat SSL Keystore Type | JKS |
+| ATL_SSO_LOGIN_URL | Login URL for Custom SSO Support | None |
+| ATL_CROWD_SSO_ENABLED | Enable Crowd SSO Support | false |
 | JVM_MINIMUM_MEMORY | Set's Java XMS | None |
 | JVM_MAXIMUM_MEMORY | Set's Java XMX | None |
 

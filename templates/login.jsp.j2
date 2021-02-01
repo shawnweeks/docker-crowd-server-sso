@@ -13,7 +13,7 @@
     <meta name="decorator" content="atl.wrm"/>
     <meta name="viewport" content="width=device-width">{% endraw %}
 	<script type="text/javascript">
-	  var ssoUrl = '{{ CUSTOM_SSO_LOGIN_URL | default('') | replace("'", "\\'") }}';
+	  var ssoUrl = '{{ ATL_SSO_LOGIN_URL | default('') | replace("'", "\\'") }}';
 	
 	  var url = new URL(window.location.href);
 	  var osDestination = url.searchParams.get("next");

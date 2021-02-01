@@ -3,21 +3,23 @@
 set -e
 umask 0027
 
-: ${JAVA_OPTS:=}
-: ${CATALINA_OPTS:=}
-
-export JAVA_OPTS="${JAVA_OPTS}"
-export CATALINA_OPTS="${CATALINA_OPTS}"
-
-shutdownCleanup() {
-    # Crowd might not have a lock but this won't hurt anything if it does.
-    if [[ -f ${HOME}/.lock ]]
-    then
-        echo "Cleaning Up Crowd Locks"
-        rm ${HOME}/.lock
-    fi
-}
+export JVM_SUPPORT_RECOMMENDED_ARGS=${ATL_JAVA_ARGS}
+export JVM_MINIMUM_MEMORY=${ATL_MIN_MEMORY}
+export JVM_MAXIMUM_MEMORY=${ATL_MAX_MEMORY}
 
 entrypoint.py
-trap "shutdownCleanup" INT
-${CROWD_INSTALL_DIR}/start_crowd.sh -fg
+
+unset "${!ATL_@}"
+
+set +e
+flock -x -w 30 ${HOME}/.flock ${CROWD_INSTALL_DIR}/start_crowd.sh -fg &
+CROWD_PID="$!"
+
+echo "Crowd Started with PID ${CROWD_PID}"
+wait ${CROWD_PID}
+
+if [[ $? -eq 1 ]]
+then
+    echo "Crowd Failed to Aquire Lock! Exiting"
+    exit 1
+fi
