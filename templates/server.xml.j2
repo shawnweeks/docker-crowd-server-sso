@@ -40,9 +40,10 @@
                        showServerInfo="false" />
                 <Valve className="org.apache.catalina.valves.RemoteIpValve" />
                 <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
-                            prefix="access_log" suffix=".log"
-                            pattern="%h %l %u %t %h &quot;%r&quot; %s %b"
-                            requestAttributesEnabled="true" />
+                            prefix="access" suffix=".log"
+                            pattern="%h %l %u %t &quot;%r&quot; %s %b"
+                            requestAttributesEnabled="true" 
+                            renameOnRotate="true" />
             </Host>
         </Engine>
 
