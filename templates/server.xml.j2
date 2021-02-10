@@ -11,7 +11,7 @@
                    secure="{{ ATL_TOMCAT_SECURE | default('false') }}"
 
                    SSLEnabled="{{ ATL_TOMCAT_SSL_ENABLED | default('false') }}"
-                   sslEnabledProtocols="{{ ATL_TOMCAT_SSL_ENABLED_PROTOCOLS | default ('TLSv1.2,TLSv1.3') }}"
+                   sslEnabledProtocols="{{ ATL_TOMCAT_SSL_ENABLED_PROTOCOLS | default ('TLSv1.2') }}"
                    keyAlias="{{ ATL_TOMCAT_KEY_ALIAS | default('') }}"
                    keystoreFile="{{ ATL_TOMCAT_KEYSTORE_FILE | default('') }}"
                    keystorePass="{{ ATL_TOMCAT_KEYSTORE_PASSWORD | default('') }}"
@@ -23,19 +23,26 @@
                    enableLookups="false"
                    maxHttpHeaderSize="8192"
                    maxThreads="150"
+                   maxConnections="5000"
                    minSpareThreads="25"                
                    redirectPort="8443"
                    useBodyEncodingForURI="true"
                    URIEncoding="UTF-8"
                    compression="on"
                    sendReasonPhrase="true"
-                   compressableMimeType="text/html,text/xml,application/xml,text/plain,text/css,application/json,application/javascript,application/x-javascript" />
+                   compressableMimeType="text/html,text/xml,application/xml,text/plain,text/css,application/json,application/javascript,application/x-javascript" 
+                   protocol="HTTP/1.1" />
 
         <Engine defaultHost="localhost" name="Catalina">
             <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true">
                 <Valve className="org.apache.catalina.valves.ErrorReportValve"
-                       showReport="true"
+                       showReport="false"
                        showServerInfo="false" />
+                <Valve className="org.apache.catalina.valves.RemoteIpValve" />
+                <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+                            prefix="access_log" suffix=".log"
+                            pattern="%h %l %u %t %h &quot;%r&quot; %s %b"
+                            requestAttributesEnabled="true" />
             </Host>
         </Engine>
 
@@ -55,5 +62,4 @@
     <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
     <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
     <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
-
 </Server>
