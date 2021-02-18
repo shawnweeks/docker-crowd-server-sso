@@ -32,13 +32,14 @@ ENV CROWD_GID 2004
 ENV CROWD_HOME /var/atlassian/application-data/crowd
 ENV CROWD_INSTALL_DIR /opt/atlassian/crowd
 
-RUN yum install -y java-11-openjdk-devel procps git python2 python2-jinja2 && \
-    yum clean all && \    
-    mkdir -p ${CROWD_HOME}/shared && \
+RUN yum install -y java-11-openjdk-devel && \
+    yum clean all && \
     mkdir -p ${CROWD_INSTALL_DIR} && \
+    mkdir -p ${CROWD_HOME}/{shared,logs} && \
     groupadd -r -g ${CROWD_GID} ${CROWD_GROUP} && \
     useradd -r -u ${CROWD_UID} -g ${CROWD_GROUP} -M -d ${CROWD_HOME} ${CROWD_USER} && \
-    chown ${CROWD_USER}:${CROWD_GROUP} ${CROWD_HOME} -R
+    chown ${CROWD_USER}:${CROWD_GROUP} ${CROWD_HOME} -R && \
+    chmod 750 ${CROWD_HOME} -R 
 
 COPY [ "templates/*.j2", "/opt/jinja-templates/" ]
 COPY --from=build --chown=${CROWD_USER}:${CROWD_GROUP} [ "/tmp/crowd_package", "${CROWD_INSTALL_DIR}/" ]
@@ -46,7 +47,7 @@ COPY --chown=${CROWD_USER}:${CROWD_GROUP} [ "entrypoint.sh", "entrypoint.py", "e
 
 
 RUN sed -i -e 's/-Xms\([0-9]\+[kmg]\) -Xmx\([0-9]\+[kmg]\)/-Xms\${JVM_MINIMUM_MEMORY:=\1} -Xmx\${JVM_MAXIMUM_MEMORY:=\2} \${JVM_SUPPORT_RECOMMENDED_ARGS} -Dcrowd.home=\${CROWD_HOME}/g' ${CROWD_INSTALL_DIR}/apache-tomcat/bin/setenv.sh && \
-    chmod 755 ${CROWD_INSTALL_DIR}/entrypoint.*
+    chmod 750 ${CROWD_INSTALL_DIR}/entrypoint.*
 
 EXPOSE 8095
 

@@ -8,6 +8,7 @@ wget https://product-downloads.atlassian.com/software/crowd/downloads/atlassian-
 ```shell
 export CROWD_VERSION=4.1.1
 docker build \
+    --progress=plain \
     -t ${REGISTRY}/atlassian-suite/crowd-server-sso:${CROWD_VERSION} \
     --build-arg BASE_REGISTRY=${REGISTRY} \
     --build-arg CROWD_VERSION=${CROWD_VERSION} \
