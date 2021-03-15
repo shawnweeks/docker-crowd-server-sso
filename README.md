@@ -1,14 +1,12 @@
 ### Download Software
 ```shell
-export CROWD_VERSION=4.1.1
+export CROWD_VERSION=4.2.3
 wget https://product-downloads.atlassian.com/software/crowd/downloads/atlassian-crowd-${CROWD_VERSION}.tar.gz
 ```
 
 ### Build Command
 ```shell
-export CROWD_VERSION=4.1.1
 docker build \
-    --progress=plain \
     -t ${REGISTRY}/atlassian-suite/crowd-server-sso:${CROWD_VERSION} \
     --build-arg BASE_REGISTRY=${REGISTRY} \
     --build-arg CROWD_VERSION=${CROWD_VERSION} \
@@ -22,7 +20,6 @@ docker push ${REGISTRY}/atlassian-suite/crowd-server-sso
 
 ### Simple Run Command
 ```shell
-export CROWD_VERSION=4.1.1
 docker run --init -it --rm \
     --name crowd  \
     -v crowd-data:/var/atlassian/application-data/crowd \
